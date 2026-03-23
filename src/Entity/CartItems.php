@@ -32,7 +32,6 @@ class CartItems
     #[Groups(['cart-items'])]
     private ?Cart $cart = null;
 
-
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "cartItems")]
     #[ORM\JoinColumn(nullable: false, onDelete: "cascade")]
     #[Groups(['cart-items'])]
