@@ -171,39 +171,6 @@ final class CommandController extends AbstractController
         }
     }
 
-    #[Route('/edit/{id}', methods: ['POST'])]
-    public function edit(int $id, Request $request): JsonResponse
-    {
-        try {
-            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-            $user = $this->getUser();
-            if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
-            }
-
-            $command = $this->entityManager->getRepository(Command::class)->findOneBy(['user' => $user, 'id' => $id]);
-            if (!$command) {
-                return $this->json(['error' => 'no command user'], Response::HTTP_NOT_FOUND);
-            }
-
-            $form = $this->createForm(CommandType::class, $command);
-            $form->submit($data, false);
-
-            if (!$form->isSubmitted() || !$form->isValid()) {
-                $errors = $this->getErrorMessages($form);
-                return $this->json(['errors'=> $errors], Response::HTTP_BAD_REQUEST);
-            }
-
-            $this->entityManager->flush();
-
-            return $this->json(['success' => true, 'message' => 'Commande mise à jour avec succès'], Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            $this->logger->error('error edit command user', ['error' => $e->getMessage()]);
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
     #[Route('/remove/{id}', methods: ['DELETE'])]
     public function delete(Command $command): JsonResponse
     {

@@ -43,7 +43,12 @@ class CommandService
 
             return $dataCommands;
         } else {
-            $dataCommand = $serializer->normalize($commands, 'json', ['groups' => ['commands']]);
+            $dataCommand = $serializer->normalize($commands, 'json', ['groups' =>
+                ['commands', 'commandItems', 'products', 'pictures'],
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
 
             return $dataCommand;
         }

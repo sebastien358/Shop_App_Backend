@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/api/payment', methods: ['POST'])]
+
 #[IsGranted('ROLE_USER')]
 final class PaymentController extends AbstractController
 {
@@ -26,6 +26,7 @@ final class PaymentController extends AbstractController
         $this->keyPrivate = $keyPrivate;
     }
 
+    #[Route('/api/payment', methods: ['POST'])]
     public function payment(Request $request, LoggerInterface $logger): JsonResponse
     {
         try {
