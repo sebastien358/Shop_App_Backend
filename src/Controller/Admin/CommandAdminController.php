@@ -22,7 +22,9 @@ class CommandAdminController extends AbstractController
     private CommandService $commandService;
     private LoggerInterface $logger;
 
-    public function __construct(EntityManagerInterface $entityManager, CommandService $commandService, LoggerInterface $logger)
+    public function __construct(
+        EntityManagerInterface $entityManager, CommandService $commandService, LoggerInterface $logger
+    )
     {
         $this->entityManager = $entityManager;
         $this->commandService = $commandService;
@@ -39,7 +41,8 @@ class CommandAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
             }
 
-            $commands = $this->entityManager->getRepository(Command::class)->findAll();
+            $commands = $this->entityManager->getRepository(Command::class)->findAllPaidCommands();
+
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
             return $this->json($dataCommands, Response::HTTP_OK);
@@ -71,6 +74,36 @@ class CommandAdminController extends AbstractController
             return $this->json(['message' => 'Le status de la préparation de la commande a été modifié'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupération des commandes : ', ['error' => $e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/delete/{id}', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+            }
+
+            $command = $this->entityManager->getRepository(Command::class)->find($id);
+
+            if (!$command) {
+                return $this->json(['error' => 'Command introuvable'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($command->getPreparationStatus() !== Command::COMMAND_STATUS_DELIVERED) {
+                return $this->json(['error' => 'Impossible de supprimer une commande non prête'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->entityManager->remove($command);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'La commande a été modifiée'], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la suppression de la commande : ', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

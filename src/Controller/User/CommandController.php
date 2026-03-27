@@ -5,13 +5,11 @@ namespace App\Controller\User;
 use App\Entity\Cart;
 use App\Entity\Command;
 use App\Entity\CommandItems;
-use App\Form\CommandType;
+use App\Repository\Form\CommandType;
 use App\Services\CommandService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,35 +33,6 @@ final class CommandController extends AbstractController
         $this->logger = $logger;
     }
 
-    // Affichage de la commande au paiment
-
-    #[Route('/user', methods: ['GET'])]
-    public function user(SerializerInterface $serializer): JsonResponse
-    {
-        try {
-            $user = $this->getUser();
-
-            if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
-            }
-
-            $commands = $this->entityManager->getRepository(Command::class)->findOneBy(['user' => $user]);
-            if (!$commands) {
-                return $this->json(['error' => 'Erreur récupératioçn d\'une commande utilisateur'], Response::HTTP_BAD_REQUEST);
-            }
-
-            $dataCommands = $serializer->normalize($commands, 'json', ['groups' => ['commands', 'commandItems'],
-                'circular_reference_handler' => function ($object) {
-                    return $object->getId();
-                }
-            ]);
-            return $this->json($dataCommands, Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            $this->logger->error('Erreur récupératioçn d\'une commande utilisateur', ['error' => $e->getMessage()]);
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
     // Affichage de la liste des commandes d'un utilisateur
 
     #[Route('/user/list', methods: ['GET'])]
@@ -76,16 +45,35 @@ final class CommandController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
             }
 
-            $commands = $this->entityManager->getRepository(Command::class)->findBy(['user' => $user]);
-            if (!$commands) {
-                return new JsonResponse(['error' => 'no command user'], Response::HTTP_NO_CONTENT);
+            $page = (int) $request->query->get('page', 1);
+            $limit = (int) $request->query->get('limit', 1);
+
+            if ($page < 1 || $limit < 1) {
+                return $this->json(['error' => 'Données manquantes ou invalides'], Response::HTTP_BAD_REQUEST);
             }
 
-            $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
-            return new JsonResponse($dataCommands, Response::HTTP_OK);
+            $commands = $this->entityManager->getRepository(Command::class)->findAllCommandByClient($user, $page, $limit);
+
+            // Normalisation même si liste vide
+            $dataCommands = $commands ? $this->commandService->getCommandData($request, $commands, $serializer) : [];
+
+            $total = $this->entityManager
+                ->getRepository(Command::class)
+                ->findAllCountCommand($user);
+
+            return $this->json([
+                'commands' => $dataCommands,
+                'total' => $total ?? 0,
+                'pages' => $limit > 0 ? ceil(($total ?? 0) / $limit) : 1
+            ], Response::HTTP_OK);
+
         } catch (\Throwable $e) {
-            $this->logger->error('error recovery commands', ['error' => $e->getMessage()]);
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $this->logger->error('Erreur récupération commandes', ['error' => $e->getMessage()]);
+            return $this->json([
+                'commands' => [],
+                'total' => 0,
+                'pages' => 1
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -103,14 +91,14 @@ final class CommandController extends AbstractController
 
             $commands = $this->entityManager->getRepository(Command::class)->findOneBy(['user' => $user, 'id' => $id]);
             if (!$commands) {
-                return new JsonResponse(['error' => 'no command user'], Response::HTTP_NO_CONTENT);
+                return $this->json(['error' => 'no command user'], Response::HTTP_NO_CONTENT);
             }
 
             $dataCommand = $this->commandService->getCommandData($request, $commands, $serializer);
-            return new JsonResponse($dataCommand, Response::HTTP_OK);
+            return $this->json($dataCommand, Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('error recovery commands', ['error' => $e->getMessage()]);
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -171,7 +159,7 @@ final class CommandController extends AbstractController
         }
     }
 
-    #[Route('/remove/{id}', methods: ['DELETE'])]
+    #[Route('/delete/{id}', methods: ['DELETE'])]
     public function delete(Command $command): JsonResponse
     {
         try {
@@ -182,11 +170,11 @@ final class CommandController extends AbstractController
             }
 
             if ($command->getUser() !== $user) {
-                return $this->json(['error' => 'La commande n\'appartient pas à l\'utilisateur connecté'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => 'La commande n\'appartient pas au client'], Response::HTTP_NOT_FOUND);
             }
 
             if ($command->getStatus() === Command::STATUS_PAID) {
-                return $this->json(['error' => 'Impossible de supprimer une coimmande payée'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Impossible pour le client de supprimer une commande payée'], Response::HTTP_FORBIDDEN);
             }
 
             $this->entityManager->remove($command);
@@ -197,14 +185,6 @@ final class CommandController extends AbstractController
             $this->logger->error('Error suppression commande', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->commandService->handleCommands();
-        $output->writeln('Commandes expirées supprimées ✅');
-
-        return Command::COMMAND_STATUS_DELIVERED;
     }
 
     private function getErrorMessages(FormInterface $form): array

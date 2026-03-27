@@ -60,7 +60,7 @@ class CommandService
 
         $commands = $this->entityManager
             ->getRepository(Command::class)
-            ->findBy(['preparationStatus' => Command::COMMAND_STATUS_DELIVERED]);
+            ->findBy(['status' => Command::STATUS_PENDING]);
 
         foreach ($commands as $command) {
             // Sécurité : ignore si updatedAt null
@@ -68,7 +68,7 @@ class CommandService
                 continue;
             }
 
-            $deadline = $command->getUpdatedAt()->modify('+2 hours');
+            $deadline = $command->getUpdatedAt()->modify('+30 minutes');
 
             if ($deadline <= $now) {
                 $this->entityManager->remove($command);

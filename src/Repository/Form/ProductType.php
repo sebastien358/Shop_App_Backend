@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Repository\Form;
 
 use App\Entity\Category;
 use App\Entity\Product;

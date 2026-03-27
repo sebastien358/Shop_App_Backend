@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
-use App\Form\ProductType;
+use App\Repository\Form\ProductType;
 use App\Services\FileUploader;
 use App\Services\ProductService;
 use Doctrine\ORM\EntityManagerInterface;

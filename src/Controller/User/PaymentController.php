@@ -93,14 +93,21 @@ final class PaymentController extends AbstractController
             ]);
 
             if ($paymentIntent->status === 'succeeded') {
-                // Retirer les produits du panier au paiment
+                // Mettre à jour le statut de la commande
+                if (isset($command)) {
+                    $command->setStatus(Command::STATUS_PAID);
+                }
+
+                // Supprimer les produits du panier
                 $cart = $user->getCart();
                 if ($cart) {
                     foreach ($cart->getCartItems() as $cartItem) {
                         $this->entityManager->remove($cartItem);
                     }
-                    $this->entityManager->flush();
                 }
+
+                // Flush unique pour tout enregistrer
+                $this->entityManager->flush();
 
                 return $this->json([
                     'type' => 'SUCCESS_PAYMENT',

@@ -17,17 +17,41 @@ class CommandRepository extends ServiceEntityRepository
         parent::__construct($registry, Command::class);
     }
 
-    public function findAllCommandUser(User $user): array
+    public function findAllCommandByClient(User $user, int $page, int $limit)
     {
-        return $this->createQueryBuilder('c')
-            ->leftJoin('c.commandItems', 'ci')->addSelect('ci')
-            ->leftJoin('ci.product', 'p')->addSelect('p')
-            ->leftJoin('p.pictures', 'pic')->addSelect('pic')
-            ->andWhere('c.user = :user')
+        return $this->createQueryBuilder('command')
+            ->where('command.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('command.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllCountCommand(User $user)
+    {
+        return $this->createQueryBuilder('command')
+            ->select('count(command.id)')
+            ->where('command.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->getArrayResult();
+            ->getSingleScalarResult();
     }
+
+// --- Pour l'admin : toutes les commandes payées ---
+    public function findAllPaidCommands(): array
+    {
+        return $this->createQueryBuilder('command')
+            ->leftJoin('command.commandItems', 'ci')
+            ->addSelect('ci')
+            ->where('command.status = :paid')
+            ->setParameter('paid', Command::STATUS_PAID)
+            ->orderBy('command.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Command[] Returns an array of Command objects

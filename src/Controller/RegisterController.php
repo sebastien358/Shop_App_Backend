@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Cart;
 use App\Entity\User;
-use App\Form\UserType;
+use App\Repository\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

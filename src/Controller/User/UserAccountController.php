@@ -3,7 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\User;
-use App\Form\UserType;
+use App\Repository\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,6 +37,10 @@ class UserAccountController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+            }
 
             $dataUser = $serializer->normalize($user, 'json', ['groups' => ['user']]);
         } catch(\Throwable $e) {
