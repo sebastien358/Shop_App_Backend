@@ -63,7 +63,11 @@ class ProductAdminController extends AbstractController
             $total = $this->entityManager->getRepository(Product::class)->findAllCountProducts();
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
-            return $this->json(['total' => $total, 'products' => $dataProducts], Response::HTTP_OK);
+            return $this->json([
+                'total' => $total,
+                'products' => $dataProducts,
+                'pages' => ceil($total / $limit)
+            ], Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Error récupération des produits', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -118,11 +122,14 @@ class ProductAdminController extends AbstractController
 
             $product = $this->entityManager->getRepository(Product::class)->find($id);
             if (empty($product)) {
-                return $this->json(['error' => 'Product not found'], Response::HTTP_NO_CONTENT);
+                return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
             }
 
             $images = $product->getPictures();
-            $this->fileUploader->removeProductImage($images);
+
+            if ($images && !$images->isEmpty()) {
+                $this->fileUploader->removeProductImage($images);
+            }
 
             $this->entityManager->remove($product);
             $this->entityManager->flush();

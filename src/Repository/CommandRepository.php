@@ -19,14 +19,14 @@ class CommandRepository extends ServiceEntityRepository
 
     public function findAllCommandByClient(User $user, int $page, int $limit)
     {
-        return $this->createQueryBuilder('command')
-            ->where('command.user = :user')
-            ->setParameter('user', $user)
-            ->orderBy('command.createdAt', 'DESC')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+       return $this->createQueryBuilder('command')
+           ->where('command.user = :user')
+           ->setParameter('user', $user)
+           ->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit)
+           ->orderBy('command.createdAt', 'DESC')
+           ->getQuery()
+           ->getResult();
     }
 
     public function findAllCountCommand(User $user)
@@ -40,6 +40,7 @@ class CommandRepository extends ServiceEntityRepository
     }
 
 // --- Pour l'admin : toutes les commandes payées ---
+
     public function findAllPaidCommands(): array
     {
         return $this->createQueryBuilder('command')
@@ -51,7 +52,6 @@ class CommandRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
 
     //    /**
     //     * @return Command[] Returns an array of Command objects

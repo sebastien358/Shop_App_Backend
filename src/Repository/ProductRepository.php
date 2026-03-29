@@ -21,6 +21,7 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -38,6 +39,7 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }

@@ -76,34 +76,35 @@ final class CartController extends AbstractController
 
             $user = $this->getUser();
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur non connecté'], Response::HTTP_FORBIDDEN);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
-            if(!$cart) {
-                return $this->json(['error' => 'Aucun panier pour cette utisateur'], Response::HTTP_NOT_FOUND);
+            if (empty($cart)) {
+                return $this->json(['error' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            if ($cart->getUser() !== $user) {
+                return $this->json(['error' => 'Le panier n\'appartient pas au client'], Response::HTTP_FORBIDDEN);
             }
 
             foreach ($data as $item) {
-                $product = $this->entityManager->getRepository(Product::class)->find($item['id']);
-                if (!$product) {
-                    return $this->json(['error' => 'Produit innexistant'], Response::HTTP_NOT_FOUND);
+                $product = $this->entityManager->getRepository(Product::class)->findOneBy(['id' => $item['id']]);
+                if (empty($product)) {
+                    return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
                 }
 
-                $itemToCart = $this->entityManager->getRepository(CartItems::class)->findOneBy(['cart' => $cart, 'product' => $product]);
-                if ($itemToCart) {
-                    $itemToCart->setQuantity($itemToCart->getQuantity() + $item['quantity']);
-                    $this->entityManager->persist($itemToCart);
+                $cartItem = $this->entityManager->getRepository(CartItems::class)->findOneBy(['cart' => $cart, 'product' => $product]);
+                if ($cartItem) {
+                    $cartItem->setQuantity($cartItem->getQuantity() + $item['quantity']);
+                    $this->entityManager->persist($cartItem);
                 } else {
                     $cartItem = new CartItems();
-
+                    $cartItem->setCart($cart);
+                    $cartItem->setProduct($product);
                     $cartItem->setTitle($item['title']);
                     $cartItem->setPrice($item['price']);
                     $cartItem->setQuantity($item['quantity']);
-
-                    $cartItem->setCart($cart);
-                    $cartItem->setProduct($product);
-
                     $this->entityManager->persist($cartItem);
                 }
             }

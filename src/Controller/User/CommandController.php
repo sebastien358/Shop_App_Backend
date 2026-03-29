@@ -46,7 +46,7 @@ final class CommandController extends AbstractController
             }
 
             $page = (int) $request->query->get('page', 1);
-            $limit = (int) $request->query->get('limit', 1);
+            $limit = (int) $request->query->get('limit', 5);
 
             if ($page < 1 || $limit < 1) {
                 return $this->json(['error' => 'Données manquantes ou invalides'], Response::HTTP_BAD_REQUEST);
@@ -54,12 +54,9 @@ final class CommandController extends AbstractController
 
             $commands = $this->entityManager->getRepository(Command::class)->findAllCommandByClient($user, $page, $limit);
 
-            // Normalisation même si liste vide
-            $dataCommands = $commands ? $this->commandService->getCommandData($request, $commands, $serializer) : [];
+            $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
-            $total = $this->entityManager
-                ->getRepository(Command::class)
-                ->findAllCountCommand($user);
+            $total = $this->entityManager->getRepository(Command::class)->findAllCountCommand($user);
 
             return $this->json([
                 'commands' => $dataCommands,
@@ -111,13 +108,15 @@ final class CommandController extends AbstractController
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
             $user = $this->getUser();
+
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
+
             if (!$cart) {
-                return $this->json(['error' => 'No cart user'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => 'Panier introuvable'], Response::HTTP_BAD_REQUEST);
             }
 
             $command = new Command();
@@ -126,12 +125,10 @@ final class CommandController extends AbstractController
             $form = $this->createForm(CommandType::class, $command);
             $form->submit($data);
 
-            if (!$form->isSubmitted() || !$form->isValid()) {
+            if (!$form->isSubmitted() && !$form->isValid()) {
                 $errors = $this->getErrorMessages($form);
-                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
-
-            $this->entityManager->persist($command);
 
             $cartItems = $cart->getCartItems();
             if ($cartItems->isEmpty()) {
@@ -147,7 +144,9 @@ final class CommandController extends AbstractController
                 $commandItem->setQuantity($item->getQuantity());
 
                 $commandItem->setCommand($command);
+
                 $this->entityManager->persist($commandItem);
+                $this->entityManager->persist($command);
             }
 
             $this->entityManager->flush();

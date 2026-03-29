@@ -5,19 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/CommandAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/CommandAdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/09a989d8297b8213da6e011350331301.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/11179edd4e2164e05e57771d89953fec.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/13dfcf9680c9961f0924a686c7dcd613.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/1cc9cb2df036bf0cc2f78c5bf129876f.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/1f989271d185f2bd2f04be5206113a85.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/7b290758203663398751af7878b6cfe9.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/9e6420b30057f6ee3f97a2143a8930d0.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/CleanCommandsCommand.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/CleanCommandsCommand.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/RegisterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/User/CartController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/CartController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/User/CommandController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/CommandController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/CommandType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/Form/CommandType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/PictureType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/Form/PictureType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/ProductType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/Form/ProductType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/UserType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/Form/UserType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DataFixtures/AppFixturesUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/DataFixtures/AppFixturesUser.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Repository/CommandRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/CommandRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Services/CommandService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/CommandService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProductRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProductRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/FileUploader.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/FileUploader.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,7 +188,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;new-version&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/petitsebastien/Desktop/Shop_App_Backend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -197,6 +199,11 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/images" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -216,6 +223,8 @@
       <workItem from="1774442237958" duration="19202000" />
       <workItem from="1774521627074" duration="14150000" />
       <workItem from="1774613610052" duration="8757000" />
+      <workItem from="1774696498287" duration="16512000" />
+      <workItem from="1774780451934" duration="9037000" />
     </task>
     <servers />
   </component>

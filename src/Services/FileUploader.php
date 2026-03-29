@@ -25,14 +25,12 @@ class FileUploader
 
     public function removeProductImage($images)
     {
-        if ($images) {
-            foreach ($images as $picture) {
-                $fileName = $this->targetDirectory . '/' . $picture->getFileName();
-                if (file_exists($fileName)) {
-                    unlink($fileName);
-                }
-                $this->entityManager->remove($picture);
+        foreach ($images as $picture) {
+            $fileName = $this->targetDirectory . '/' . $picture->getFileName();
+            if (file_exists($fileName)) {
+                unlink($fileName);
             }
+            $this->entityManager->remove($picture);
         }
     }
 }
