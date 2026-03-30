@@ -1,5 +1,3 @@
-# shop_backend
-
 ## Compte de démonstration pour les recruteurs
 
 ## Objectif du projet
@@ -25,5 +23,12 @@ Vous pouvez utiliser le compte suivant pour tester l'administration et voir les 
 
 - **Email :** sebastienpetit27330@gmail.com
 - **Mot de passe :** password
+
+> Carte de test Stripe
+> 
+- Numéro : 4242 4242 4242 4242
+- Expiration : 07/28
+- CVC : 123
+- Département (ZIP) : 75001
 
 > Ce compte est uniquement pour la démonstration. Les modifications effectuées sont temporaires.
