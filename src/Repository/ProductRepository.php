@@ -49,6 +49,7 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->where('p.title LIKE :search')
             ->setParameter('search', '%' . $search . '%')
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -59,6 +60,7 @@ class ProductRepository extends ServiceEntityRepository
             ->andWhere('p.price BETWEEN :minPrice AND :maxPrice')
             ->setParameter('minPrice', $minPrice)
             ->setParameter('maxPrice', $maxPrice)
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -69,6 +71,7 @@ class ProductRepository extends ServiceEntityRepository
             ->join('p.category', 'c')
             ->where('c.name = :category')
             ->setParameter('category', $category)
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }

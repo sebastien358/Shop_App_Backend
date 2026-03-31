@@ -48,7 +48,7 @@ class UserAccountController extends AbstractController
             return $this->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->json($dataUser, Response::HTTP_ACCEPTED);
+        return $this->json($dataUser, Response::HTTP_OK);
     }
 
     #[Route('/{id}', methods: ['GET'])]
@@ -61,7 +61,7 @@ class UserAccountController extends AbstractController
             }
 
             $dataUser = $serializer->normalize($user, 'json', ['groups' => ['user']]);
-            return $this->json($dataUser, Response::HTTP_ACCEPTED);
+            return $this->json($dataUser, Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Something went wrong : ', ['Error' => $e->getMessage()]);
             return $this->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

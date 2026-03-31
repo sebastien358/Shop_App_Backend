@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProductRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProductRepository.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -211,6 +212,7 @@
       <workItem from="1774613610052" duration="8757000" />
       <workItem from="1774696498287" duration="16512000" />
       <workItem from="1774780451934" duration="9037000" />
+      <workItem from="1774870864341" duration="13186000" />
     </task>
     <servers />
   </component>
