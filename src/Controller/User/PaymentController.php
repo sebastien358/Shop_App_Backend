@@ -2,11 +2,14 @@
 
 namespace App\Controller\User;
 
+use App\Entity\CartItems;
 use App\Entity\Command;
+use App\Entity\Product;
 use App\Entity\User;
 use App\Repository\CommandRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Proxies\__CG__\App\Entity\Cart;
 use Psr\Log\LoggerInterface;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
@@ -28,7 +31,6 @@ final class PaymentController extends AbstractController
     {
         $this->keyPrivate = $keyPrivate;
         $this->entityManager = $entityManager;
-
     }
 
     #[Route('/api/payment', methods: ['POST'])]
@@ -36,6 +38,7 @@ final class PaymentController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
             $token = $data['token'] ?? null;
             $commandId = $data['commandId'] ?? null;
             $items = $data['items'] ?? null;
@@ -45,8 +48,15 @@ final class PaymentController extends AbstractController
             }
 
             $user = $this->getUser();
+
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur non connecté'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
+
+            if ($cart->getUser() !== $user) {
+                return $this->json(['error' => 'Le panier ne correspond pas au client'], Response::HTTP_FORBIDDEN);
             }
 
             $totalAmount = 0;
@@ -64,11 +74,13 @@ final class PaymentController extends AbstractController
             } elseif ($items) {
                 // Commande depuis le panier
                 foreach ($items as $item) {
-                    $product = $productRepository->find($item['productId']);
-                    if (!$product) {
-                        return $this->json(['error' => 'Produit introuvable: ' . $item['productId']], Response::HTTP_NOT_FOUND);
+                    $cartItem = $this->entityManager->getRepository(CartItems::class)->findOneBy(['cart' => $cart, 'id' => $item['id']]);
+
+                    if (!$cartItem) {
+                        return $this->json(['error' => 'Produit introuvable: ' . $item['id']], Response::HTTP_NOT_FOUND);
                     }
-                    $totalAmount += $product->getPrice() * $item['quantity'];
+
+                    $totalAmount += $cartItem->getPrice() * $cartItem->getQuantity();
                 }
             } else {
                 return $this->json(['error' => 'Aucune commande ou items fournis'], Response::HTTP_BAD_REQUEST);
@@ -76,7 +88,7 @@ final class PaymentController extends AbstractController
 
             // Montant en centimes pour Stripe
 
-            $totalAmountCents = (int) ($totalAmount * 100);
+            //$totalAmountCents = (int) ($totalAmount * 100);
 
             $total = 100;
 
