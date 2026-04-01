@@ -5,6 +5,7 @@ namespace App\Controller\User;
 use App\Entity\Cart;
 use App\Entity\CartItems;
 use App\Entity\Product;
+use App\Services\CartService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,11 +20,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class CartController extends AbstractController
 {
     private $entityManager;
+    private CartService $cartService;
     private $logger;
 
-    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
+    public function __construct(EntityManagerInterface $entityManager, CartService $cartService, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->cartService = $cartService;
         $this->logger = $logger;
     }
 
@@ -34,7 +37,7 @@ final class CartController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Aucun utilisateur connecté'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Aucun utilisateur connecté'], Response::HTTP_UNAUTHORIZED);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
@@ -44,22 +47,7 @@ final class CartController extends AbstractController
 
             $items = $cart->getCartItems();
 
-            $dataItems = $serializer->normalize($items, 'json', ['groups' => ['cart', 'cart-items', 'products', 'pictures'],
-                'circular_reference_handler' => function ($object) {
-                    return $object->getId();
-                }
-            ]);
-
-            $baseUrl = $request->getSchemeAndHttpHost() . '/images/' ;
-            foreach ($dataItems as &$item) {
-                if (isset($item['product']['pictures'])) {
-                    foreach ($item['product']['pictures'] as &$picture) {
-                        if (isset($picture['filename'])) {
-                            $picture['filename'] = $baseUrl . $picture['filename'];
-                        }
-                    }
-                }
-            }
+            $dataItems = $this->cartService->getCartData($request, $items, $serializer);
 
             return $this->json($dataItems, Response::HTTP_OK);
         } catch (\Throwable $e) {
@@ -76,7 +64,7 @@ final class CartController extends AbstractController
 
             $user = $this->getUser();
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur non connecté'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur non connecté'], Response::HTTP_UNAUTHORIZED);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
@@ -123,11 +111,13 @@ final class CartController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
+
             if(!$cart) {
                 return $this->json(['error' => 'Aucun panier pour cette utisateur'], Response::HTTP_NOT_FOUND);
             }
@@ -157,11 +147,13 @@ final class CartController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
+
             if(!$cart) {
                 return $this->json(['error' => 'Aucun panier pour cette utisateur'], Response::HTTP_NOT_FOUND);
             }
