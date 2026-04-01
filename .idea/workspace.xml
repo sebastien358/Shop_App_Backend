@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/UserAccountController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ProductRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProductRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/59767c63fa2e48dca5d4a8f814e33f7c.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/776912052d15a1e95f201f75b30b0a35.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/e1b04294b5cb6aeba74d8f6eecfc3e52.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/ProductService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/ProductService.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,6 +218,8 @@
       <workItem from="1774696498287" duration="16512000" />
       <workItem from="1774780451934" duration="9037000" />
       <workItem from="1774870864341" duration="13186000" />
+      <workItem from="1774985472131" duration="4744000" />
+      <workItem from="1775043317950" duration="10724000" />
     </task>
     <servers />
   </component>

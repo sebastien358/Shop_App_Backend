@@ -39,9 +39,24 @@ class ProductService
             }
 
             return $dataProducts;
-        }
 
-        return [];
+        } else {
+            $dataProduct = $serializer->normalize($products, 'json', ['groups' => ['products', 'categories', 'pictures'],
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
+
+            $urlImage = $request->getSchemeAndHttpHost() . '/images/';
+
+            foreach ($dataProduct['pictures'] as &$product) {
+                if (isset($product['filename'])) {
+                    $product['filename'] = $urlImage . $product['filename'];
+                }
+            }
+
+            return $dataProduct;
+        }
     }
 
     public function handleProductImages($request, $product)

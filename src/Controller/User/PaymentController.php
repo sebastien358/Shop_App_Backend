@@ -4,15 +4,9 @@ namespace App\Controller\User;
 
 use App\Entity\CartItems;
 use App\Entity\Command;
-use App\Entity\Product;
-use App\Entity\User;
-use App\Repository\CommandRepository;
-use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Proxies\__CG__\App\Entity\Cart;
 use Psr\Log\LoggerInterface;
-use Stripe\Stripe;
-use Stripe\PaymentIntent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,16 +19,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class PaymentController extends AbstractController
 {
     private string $keyPrivate;
+    private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(string $keyPrivate, EntityManagerInterface $entityManager)
-    {
+    public function __construct(string $keyPrivate, LoggerInterface $logger, EntityManagerInterface $entityManager){
         $this->keyPrivate = $keyPrivate;
+        $this->logger = $logger;
         $this->entityManager = $entityManager;
     }
 
     #[Route('/api/payment', methods: ['POST'])]
-    public function payment(Request $request, LoggerInterface $logger, ProductRepository $productRepository, CommandRepository $commandRepository): JsonResponse
+    public function payment(Request $request, LoggerInterface $logger): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -63,14 +58,15 @@ final class PaymentController extends AbstractController
 
             if ($commandId) {
                 // Commande depuis le profil user
-                $command = $commandRepository->find($commandId);
+                $command = $this->entityManager->getRepository(Command::class)->find($commandId);
                 if (!$command) {
                     return $this->json(['error' => 'Commande introuvable'], Response::HTTP_NOT_FOUND);
                 }
 
-                foreach ($command->getCommandItems() as $item) {
-                    $totalAmount += $item->getPrice() * $item->getQuantity();
+                foreach ($command->getCommandItems() as $commandItem) {
+                    $totalAmount += $commandItem->getPrice() * $commandItem->getQuantity();
                 }
+
             } elseif ($items) {
                 // Commande depuis le panier
                 foreach ($items as $item) {
@@ -125,13 +121,13 @@ final class PaymentController extends AbstractController
                     'type' => 'SUCCESS_PAYMENT',
                     'message' => 'Paiement accepté',
                     'paymentId' => $paymentIntent->id
-                ]);
+                ], Response::HTTP_CREATED);
             } else {
                 return $this->json([
                     'type' => 'ERROR_PAYMENT',
                     'message' => 'Paiement échoué',
                     'status' => $paymentIntent->status
-                ], Response::HTTP_BAD_REQUEST);
+                ], Response::HTTP_CONFLICT);
             }
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
