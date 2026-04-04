@@ -59,12 +59,12 @@ class CommandAdminController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur inexistant'], Response::HTTP_UNAUTHORIZED);
             }
 
             $command = $this->entityManager->getRepository(Command::class)->find($id);
             if (!$command) {
-                return $this->json(['error' => 'Command introuvable'], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => 'Command introuvable'], Response::HTTP_NOT_FOUND);
             }
 
             $command->setPreparationStatus($preparationStatus);
@@ -85,7 +85,7 @@ class CommandAdminController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $command = $this->entityManager->getRepository(Command::class)->find($id);

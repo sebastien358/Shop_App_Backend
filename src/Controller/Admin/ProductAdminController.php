@@ -221,17 +221,20 @@ class ProductAdminController extends AbstractController
                 return $this->json(['error' => 'Product not found'], Response::HTTP_BAD_REQUEST);
             }
 
+            $imageCurrent = null;
+
             foreach ($product->getPictures() as $picture) {
-                if ($picture->getId() !== $imageId) {
-                    return $this->json(['error' => 'L\'image ne correspond pas au produit'], Response::HTTP_BAD_REQUEST);
+                if ($picture->getId() === $imageId) {
+                    $imageCurrent = $picture;
+                    break;
                 }
             }
 
-            $images = $product->getPictures();
-
-            if ($images && !$images->isEmpty()) {
-                $this->fileUploader->removeProductImage($images);
+            if (!$imageCurrent) {
+                return $this->json(['error' => 'L\'image ne correspond pas au produit'], Response::HTTP_NOT_FOUND);
             }
+
+            $this->fileUploader->removeProductAdminImage($imageCurrent);
 
             $this->entityManager->flush();
 
