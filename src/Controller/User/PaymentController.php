@@ -36,7 +36,7 @@ final class PaymentController extends AbstractController
 
             $token = $data['token'] ?? null;
             $commandId = $data['commandId'] ?? null;
-            $items = $data['items'] ?? null;
+            $cartItems = $data['cartItems'] ?? null;
 
             if (!$token) {
                 return $this->json(['error' => 'Token Stripe requis'], Response::HTTP_BAD_REQUEST);
@@ -57,34 +57,33 @@ final class PaymentController extends AbstractController
             $totalAmount = 0;
 
             if ($commandId) {
-                // Commande depuis le profil user
                 $command = $this->entityManager->getRepository(Command::class)->find($commandId);
                 if (!$command) {
-                    return $this->json(['error' => 'Commande introuvable'], Response::HTTP_NOT_FOUND);
+                    return $this->json(['error' => 'Command introuvable'], Response::HTTP_NOT_FOUND);
                 }
 
                 foreach ($command->getCommandItems() as $commandItem) {
                     $totalAmount += $commandItem->getPrice() * $commandItem->getQuantity();
                 }
 
-            } elseif ($items) {
-                // Commande depuis le panier
-                foreach ($items as $item) {
-                    $cartItem = $this->entityManager->getRepository(CartItems::class)->findOneBy(['cart' => $cart, 'id' => $item['id']]);
-
-                    if (!$cartItem) {
-                        return $this->json(['error' => 'Produit introuvable: ' . $item['id']], Response::HTTP_NOT_FOUND);
+            } elseif ($cartItems) {
+                foreach ($cartItems as $cartItem) {
+                    $item = $this->entityManager->getRepository(CartItems::class)->find($cartItem['id']);
+                    if (!$item) {
+                        return $this->json(['error' => 'Panier vide'], Response::HTTP_NOT_FOUND);
                     }
 
-                    $totalAmount += $cartItem->getPrice() * $cartItem->getQuantity();
+                    $totalAmount += $item->getPrice() * $item->getQuantity();
                 }
             } else {
-                return $this->json(['error' => 'Aucune commande ou items fournis'], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => 'Commande ou Items introuvable'], Response::HTTP_NOT_FOUND);
             }
 
             // Montant en centimes pour Stripe
 
-            //$totalAmountCents = (int) ($totalAmount * 100);
+            $totalAmountCents = (int) ($totalAmount * 100);
+
+            dd($totalAmountCents);
 
             $total = 100;
 

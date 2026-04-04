@@ -42,7 +42,7 @@ final class CommandController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $page = (int) $request->query->get('page', 1);
@@ -83,7 +83,7 @@ final class CommandController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $commands = $this->entityManager->getRepository(Command::class)->findOneBy(['user' => $user, 'id' => $id]);
@@ -110,7 +110,7 @@ final class CommandController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $cart = $this->entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
@@ -165,7 +165,7 @@ final class CommandController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             if ($command->getUser() !== $user) {
