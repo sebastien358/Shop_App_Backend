@@ -83,7 +83,7 @@ final class PaymentController extends AbstractController
 
             $totalAmountCents = (int) ($totalAmount * 100);
 
-            dd($totalAmountCents);
+            //dd($totalAmountCents);
 
             $total = 100;
 
